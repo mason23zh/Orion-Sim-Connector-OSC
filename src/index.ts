@@ -1,4 +1,5 @@
 import { detectSimulator } from './detectSimulator';
+import {setGetLatestFlightData} from "./wsServer";
 
 const start = async () => {
   const simulator = await detectSimulator();
@@ -6,10 +7,16 @@ const start = async () => {
 
   if (simulator === 'SimConnect (MSFS2020 or P3D)') {
     // Initialize SimConnect-related logic
-    import('./udpServer'); // Ensure udpClient is set up for SimConnect
+    import("./simConnectServer").then((module) => {
+      setGetLatestFlightData(module.getLatestFlightData)
+    })
+    import("./wsServer")
   } else if (simulator === 'X-Plane') {
     // Initialize UDP-related logic
-    import('./udpServer');
+    // import('./udpServer');
+    import("./udpServer").then((module) => {
+      setGetLatestFlightData(module.getLatestFlightData)
+    })
     import('./wsServer'); // Ensure wsServer is set up for UDP
   } else {
     console.error('No supported simulator running.');

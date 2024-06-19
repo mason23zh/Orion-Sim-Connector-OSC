@@ -10,7 +10,7 @@ interface FlightData {
   latitude?: number;
   longitude?: number;
   heading?: number;
-  airspeed?: number;
+  groundspeed?: number;
   altitude?:number;
 }
 
@@ -29,7 +29,7 @@ const messages = [
   createMessage('sim/flightmodel/position/latitude', 1, FREQ),
   createMessage('sim/flightmodel/position/longitude', 2, FREQ),
   createMessage('sim/flightmodel/position/mag_psi', 3, FREQ),
-  createMessage('sim/flightmodel/position/true_airspeed', 4, FREQ),
+  createMessage('sim/flightmodel/position/groundspeed', 4, FREQ),
   createMessage("sim/flightmodel/position/y_agl",5,FREQ)
 ];
 
@@ -58,7 +58,7 @@ client.on('message', (message) => {
     latitude: values[0],
     longitude: values[1],
     heading: values[2],
-    airspeed:values[3],
+    groundspeed:values[3],
     altitude:values[4],
   };
 
