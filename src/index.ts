@@ -13,11 +13,10 @@ const start = async () => {
     import("./wsServer")
   } else if (simulator === 'X-Plane') {
     // Initialize UDP-related logic
-    // import('./udpServer');
     import("./udpServer").then((module) => {
       setGetLatestFlightData(module.getLatestFlightData)
     })
-    import('./wsServer'); // Ensure wsServer is set up for UDP
+    import('./wsServer');
   } else {
     console.error('No supported simulator running.');
   }

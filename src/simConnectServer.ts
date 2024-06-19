@@ -22,6 +22,18 @@ let latestFlightData: FlightData = {
   groundspeed: 0,
 };
 
+// const enum EventID {
+//   PAUSE,
+// }
+//
+// const enum DefinitionID {
+//   LIVE_DATA,
+// }
+//
+// const enum RequestID {
+//   LIVE_DATA,
+// }
+
 export const getLatestFlightData = (): FlightData => latestFlightData;
 
 const AIRCRAFT_DATA_REQUEST = 0;
@@ -45,10 +57,10 @@ open('My app', Protocol.FSX_SP2)
       SimConnectDataType.FLOAT64
     );
 
-    // MSL
+    // AGL
     handle.addToDataDefinition(
       AIRCRAFT_DATA_DEFINITION,
-      'PLANE ALTITUDE',
+      'PLANE ALT ABOVE GROUND',
       'feet',
       SimConnectDataType.FLOAT64
     );
@@ -86,6 +98,7 @@ open('My app', Protocol.FSX_SP2)
         console.log('Latest Flight Data:', latestFlightData);
       }
     });
+
 
   })
   .catch((error) => {

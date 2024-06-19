@@ -30,7 +30,8 @@ const messages = [
   createMessage('sim/flightmodel/position/longitude', 2, FREQ),
   createMessage('sim/flightmodel/position/mag_psi', 3, FREQ),
   createMessage('sim/flightmodel/position/groundspeed', 4, FREQ),
-  createMessage("sim/flightmodel/position/y_agl",5,FREQ)
+  createMessage("sim/flightmodel/position/y_agl",5,FREQ),
+  // createMessage("sim/aircraft/view/acf_ICAO",6,FREQ)
 ];
 
 client.on('listening', () => {
@@ -44,6 +45,7 @@ client.on('message', (message) => {
     console.log('Unknown package. Ignoring');
     return;
   }
+
 
   let offset = 9;
   const values = [];
@@ -60,6 +62,7 @@ client.on('message', (message) => {
     heading: values[2],
     groundspeed:values[3],
     altitude:values[4],
+    // acf:Buffer.from(message).toString(),
   };
 
   console.log('Decoded message:', latestFlightData);
@@ -74,6 +77,7 @@ for (const message of messages) {
     }
   });
 }
+
 
 export const getLatestFlightData = (): FlightData => latestFlightData;
 

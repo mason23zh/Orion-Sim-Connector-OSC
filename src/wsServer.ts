@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
-// import { getLatestFlightData } from './udpServer';
 
 let getLatestFlightData: () => any;
 
+// use for dynamic import
 export const setGetLatestFlightData = (dataFunc: () => any) => {
   getLatestFlightData = dataFunc;
 }
@@ -17,7 +17,7 @@ wss.on('connection', (ws) => {
       const data = getLatestFlightData();
       ws.send(JSON.stringify(data));
     }
-  }, 1000);
+  }, 500);
 });
 
 console.log('WebSocket Server listening on ws://localhost:6789');
