@@ -137,7 +137,7 @@ const connectToSim = () => {
             groundspeed: recvSimObjectData.data.readFloat64(),
             pitch:recvSimObjectData.data.readFloat64(),
             roll:recvSimObjectData.data.readFloat64(),
-            vertical_speed:recvSimObjectData.data.readFloat64(),
+            vertical_speed:recvSimObjectData.data.readFloat64() * 60,
           };
           console.log('Latest Flight Data:', latestFlightData);
           setCurrentSimulator(Simulator.MSFS); // Ensure simulator state is set
