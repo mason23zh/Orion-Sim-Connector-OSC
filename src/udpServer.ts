@@ -1,6 +1,7 @@
 import dgram from "dgram";
 import { setCurrentSimulator, Simulator } from "./simulatorState";
 import { detectSimulator } from "./detectSimulator";
+import { FlightData, UdpError } from "./types";
 
 const HOST = '127.0.0.1';
 const FREQ = 3; // Frequency of updates (times per second)
@@ -8,25 +9,6 @@ const RECEIVING_PORTS = [7172, 49001]; // X-Plane data receiving port list
 const XPLANE_PORTS = [49000, 49010]; // X-Plane data request port list
 const VALID_DATA_TIMEOUT = 5000; // 5 seconds timeout to switch port
 const MeterToFeet = 3.28084;
-
-interface UdpError extends Error {
-  code: string;
-}
-
-interface FlightData {
-  latitude?: number;
-  longitude?: number;
-  MSL?: number;
-  AGL?: number;
-  heading?: number;
-  true_heading?: number;
-  indicated_airspeed?: number;
-  true_airspeed?: number;
-  groundspeed?: number;
-  pitch?: number;
-  roll?: number;
-  vertical_speed?: number;
-}
 
 let latestFlightData: FlightData = {};
 let udpClient: dgram.Socket | null = null;

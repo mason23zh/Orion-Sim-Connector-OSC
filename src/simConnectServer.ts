@@ -1,26 +1,20 @@
-import {
-  open,
-  Protocol,
-  SimConnectConstants,
-  SimConnectDataType,
-  SimConnectPeriod,
-} from 'node-simconnect';
-import { setCurrentSimulator, Simulator } from './simulatorState';
-
-interface FlightData {
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  heading: number;
-  groundspeed: number;
-}
+import { open, Protocol, SimConnectConstants, SimConnectDataType, SimConnectPeriod } from "node-simconnect";
+import { setCurrentSimulator, Simulator } from "./simulatorState";
+import { FlightData } from "./types";
 
 let latestFlightData: FlightData = {
   latitude: 0,
   longitude: 0,
-  altitude: 0,
-  heading: 0,
+  MSL: 0,
+  AGL:0,
+  heading:0,
+  true_heading:0,
+  indicated_airspeed:0,
+  true_airspeed:0,
   groundspeed: 0,
+  pitch:0,
+  roll:0,
+  vertical_speed:0
 };
 
 let simConnectHandle: any = null;
@@ -39,17 +33,25 @@ const connectToSim = () => {
 
       handle.addToDataDefinition(
         AIRCRAFT_DATA_DEFINITION,
-        'Plane Latitude',
+        'PLANE LATITUDE',
+        'degrees',
+        SimConnectDataType.FLOAT64
+      );
+
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'PLANE LONGITUDE',
         'degrees',
         SimConnectDataType.FLOAT64
       );
 
       handle.addToDataDefinition(
         AIRCRAFT_DATA_DEFINITION,
-        'Plane Longitude',
-        'degrees',
+        'PLANE ALTITUDE',
+        'feet',
         SimConnectDataType.FLOAT64
-      );
+      )
 
       handle.addToDataDefinition(
         AIRCRAFT_DATA_DEFINITION,
@@ -67,10 +69,52 @@ const connectToSim = () => {
 
       handle.addToDataDefinition(
         AIRCRAFT_DATA_DEFINITION,
+        'PLANE HEADING DEGREES TRUE',
+        'degrees',
+        SimConnectDataType.FLOAT64
+      )
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'AIRSPEED INDICATED',
+        'knots',
+        SimConnectDataType.FLOAT64
+      )
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'AIRSPEED TRUE',
+        'knots',
+        SimConnectDataType.FLOAT64
+      )
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
         'GROUND VELOCITY',
         'knots',
         SimConnectDataType.FLOAT64
       );
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'PLANE PITCH DEGREES',
+        'degrees',
+        SimConnectDataType.FLOAT64
+      )
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'PLANE BANK DEGREES',
+        'degrees',
+        SimConnectDataType.FLOAT64
+      )
+
+      handle.addToDataDefinition(
+        AIRCRAFT_DATA_DEFINITION,
+        'VERTICAL SPEED',
+        'feet',
+        SimConnectDataType.FLOAT64
+      )
 
       handle.requestDataOnSimObject(
         AIRCRAFT_DATA_REQUEST,
@@ -84,9 +128,16 @@ const connectToSim = () => {
           latestFlightData = {
             latitude: recvSimObjectData.data.readFloat64(),
             longitude: recvSimObjectData.data.readFloat64(),
-            altitude: recvSimObjectData.data.readFloat64(),
-            heading: recvSimObjectData.data.readFloat64(),
+            MSL: recvSimObjectData.data.readFloat64(),
+            AGL:recvSimObjectData.data.readFloat64(),
+            heading:recvSimObjectData.data.readFloat64(),
+            true_heading:recvSimObjectData.data.readFloat64(),
+            indicated_airspeed:recvSimObjectData.data.readFloat64(),
+            true_airspeed:recvSimObjectData.data.readFloat64(),
             groundspeed: recvSimObjectData.data.readFloat64(),
+            pitch:recvSimObjectData.data.readFloat64(),
+            roll:recvSimObjectData.data.readFloat64(),
+            vertical_speed:recvSimObjectData.data.readFloat64(),
           };
           console.log('Latest Flight Data:', latestFlightData);
           setCurrentSimulator(Simulator.MSFS); // Ensure simulator state is set
