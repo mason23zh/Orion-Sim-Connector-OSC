@@ -12,8 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/pidusage": "^2.0.5",
     "dgram": "^1.0.1",
     "node-simconnect": "^3.6.2",
+    "pidusage": "^3.0.2",
+    "ps-list": "^8.1.1",
     "ws": "^8.17.1"
   },
   "devDependencies": {

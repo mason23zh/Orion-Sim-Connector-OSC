@@ -1,25 +1,38 @@
-import { detectSimulator } from './detectSimulator';
-import {setGetLatestFlightData} from "./wsServer";
+import { detectSimulator, handleSimulatorSwitch } from './detectSimulator';
+import { startSimConnect, stopSimConnect } from './simConnectServer';
+import { startUDPServer, stopUDPServer } from './udpServer';
+import { wsServer } from './wsServer';
+import { Simulator } from './simulatorState';
 
-const start = async () => {
-  const simulator = await detectSimulator();
-  console.log(`Detected Simulator: ${simulator}`);
+const RETRY_DELAY = 2000; // 2 seconds
 
-  if (simulator === 'SimConnect (MSFS2020 or P3D)') {
-    // Initialize SimConnect-related logic
-    import("./simConnectServer").then((module) => {
-      setGetLatestFlightData(module.getLatestFlightData)
-    })
-    import("./wsServer")
-  } else if (simulator === 'X-Plane') {
-    // Initialize UDP-related logic
-    import("./udpServer").then((module) => {
-      setGetLatestFlightData(module.getLatestFlightData)
-    })
-    import('./wsServer');
-  } else {
-    console.error('No supported simulator running.');
+async function initialize() {
+  wsServer.start();
+
+  while (true) {
+    try {
+      const simulator = await detectSimulator();
+      if (simulator !== Simulator.NONE) {
+        console.log(`Simulator detected: ${simulator}`);
+
+        if (simulator === Simulator.MSFS) {
+          await startSimConnect();
+        } else if (simulator === Simulator.XPLANE) {
+          await startUDPServer();
+        }
+
+        setInterval(handleSimulatorSwitch, 5000); // Check for simulator switch every 5 seconds
+        break;
+      } else {
+        console.log('Waiting for simulator to connect...');
+      }
+    } catch (error) {
+      console.error('Error while detecting simulator:', error);
+    }
+    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
   }
-};
+}
 
-start();
+initialize().catch((error) => {
+  console.error('Failed to initialize:', error);
+});

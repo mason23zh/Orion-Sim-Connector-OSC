@@ -1,23 +1,28 @@
 import WebSocket from 'ws';
+import { addClient as addSimConnectClient, removeClient as removeSimConnectClient } from './simConnectServer';
+import { addClient as addUDPClient, removeClient as removeUDPClient } from './udpServer';
 
-let getLatestFlightData: () => any;
+const wsServer = {
+  start: () => {
+    const wss = new WebSocket.Server({ port: 6789 });
+    wss.on('connection', (ws) => {
+      console.log('Client connected');
+      addSimConnectClient(ws);
+      addUDPClient(ws);
 
-// use for dynamic import
-export const setGetLatestFlightData = (dataFunc: () => any) => {
-  getLatestFlightData = dataFunc;
-}
+      ws.on('close', () => {
+        removeSimConnectClient(ws);
+        removeUDPClient(ws);
+        console.log('Client disconnected');
+      });
 
-const wss = new WebSocket.Server({ port: 6789 });
+      ws.on('message', (message) => {
+        console.log('received:', message);
+      });
 
-wss.on('connection', (ws) => {
-  console.log('WebSocket client connected');
+      ws.send('Welcome to Flight Sim Data Server');
+    });
+  },
+};
 
-  setInterval(() => {
-    if(getLatestFlightData) {
-      const data = getLatestFlightData();
-      ws.send(JSON.stringify(data));
-    }
-  }, 500);
-});
-
-console.log('WebSocket Server listening on ws://localhost:6789');
+export { wsServer };
