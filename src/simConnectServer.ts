@@ -1,5 +1,5 @@
 import { open, Protocol, SimConnectConstants, SimConnectDataType, SimConnectPeriod } from "node-simconnect";
-import { setCurrentSimulator, Simulator } from "./simulatorState";
+import {currentSimulator,setCurrentSimulator, Simulator } from "./simulatorState";
 import { FlightData } from "./types";
 
 let latestFlightData: FlightData = {
@@ -18,6 +18,7 @@ let latestFlightData: FlightData = {
 };
 
 let simConnectHandle: any = null;
+let reconnectTimeout: NodeJS.Timeout | null = null;
 let wsClients: any[] = [];
 
 const AIRCRAFT_DATA_REQUEST = 0;
@@ -26,6 +27,8 @@ const AIRCRAFT_DATA_DEFINITION = 0;
 export const getLatestFlightData = (): FlightData => latestFlightData;
 
 const connectToSim = () => {
+  if(currentSimulator !== Simulator.MSFS) return;
+
   open('My app', Protocol.FSX_SP2)
     .then(({ recvOpen, handle }) => {
       simConnectHandle = handle;
@@ -148,18 +151,25 @@ const connectToSim = () => {
       handle.on('quit', () => {
         console.log('The simulator quit. Will try to reconnect.');
         handle.close();
-        connectToSim();
+        if(currentSimulator === Simulator.MSFS){
+          reconnectTimeout = setTimeout(connectToSim, 5000)
+        }
+        // connectToSim();
       });
 
       handle.on('close', () => {
         console.log('Connection closed unexpectedly. Will try to reconnect.');
         handle.close();
-        connectToSim();
+        if(currentSimulator === Simulator.MSFS){
+          reconnectTimeout = setTimeout(connectToSim, 5000)
+        }
       });
     })
     .catch((error) => {
       console.log('Failed to connect. Will try again in 5 seconds. Details:', error.message);
-      setTimeout(connectToSim, 5000);
+      if(currentSimulator === Simulator.MSFS){
+        reconnectTimeout = setTimeout(connectToSim, 5000)
+      }
     });
 };
 
@@ -174,6 +184,12 @@ export const startSimConnect = () => {
 };
 
 export const stopSimConnect = () => {
+  // setCurrentSimulator(Simulator.NONE);
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+  }
+
   if (simConnectHandle) {
     simConnectHandle.close();
     simConnectHandle = null;
