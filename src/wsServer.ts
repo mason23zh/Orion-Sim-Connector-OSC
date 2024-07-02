@@ -19,8 +19,6 @@ const wsServer = {
       ws.on('message', (message) => {
         console.log('received:', message);
       });
-
-      ws.send('Welcome to Flight Sim Data Server');
     });
   },
 };

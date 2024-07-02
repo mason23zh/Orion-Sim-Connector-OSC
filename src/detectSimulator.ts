@@ -57,28 +57,6 @@ export const detectSimulator = async (): Promise<Simulator> => {
   }
 };
 
-// export const handleSimulatorSwitch = async () => {
-//   const newSimulator = await detectSimulator();
-//   const currentSimulator = getCurrentSimulator();
-//
-//   if (newSimulator !== currentSimulator) {
-//     if (currentSimulator === Simulator.MSFS) {
-//       await stopSimConnect();
-//     } else if (currentSimulator === Simulator.XPLANE) {
-//       await stopUDPServer();
-//     }
-//
-//     if (newSimulator === Simulator.MSFS) {
-//       await startSimConnect();
-//     } else if (newSimulator === Simulator.XPLANE) {
-//       await startUDPServer();
-//     }
-//
-//     setCurrentSimulator(newSimulator);
-//     console.log(`Switched to ${newSimulator}`);
-//   }
-// };
-
 export const handleSimulatorSwitch = async () => {
   const newSimulator = await detectSimulator();
 
