@@ -27,11 +27,12 @@ const AIRCRAFT_DATA_DEFINITION = 0;
 export const getLatestFlightData = (): FlightData => latestFlightData;
 
 const connectToSim = () => {
-  if(currentSimulator !== Simulator.MSFS) return;
+  // if(currentSimulator !== Simulator.MSFS) return;
 
   open('My app', Protocol.FSX_SP2)
     .then(({ recvOpen, handle }) => {
       simConnectHandle = handle;
+      let simIsQuitting = false;
       console.log('Connected to', recvOpen.applicationName);
 
       handle.addToDataDefinition(
@@ -151,16 +152,14 @@ const connectToSim = () => {
       handle.on('quit', () => {
         console.log('The simulator quit. Will try to reconnect.');
         handle.close();
-        if(currentSimulator === Simulator.MSFS){
-          reconnectTimeout = setTimeout(connectToSim, 5000)
-        }
-        // connectToSim();
+        connectToSim();
+        simIsQuitting = true;
       });
 
       handle.on('close', () => {
-        console.log('Connection closed unexpectedly. Will try to reconnect.');
-        handle.close();
-        if(currentSimulator === Simulator.MSFS){
+        if(!simIsQuitting && currentSimulator === Simulator.MSFS){
+          console.log('Connection closed unexpectedly. Will try to reconnect.');
+          handle.close();
           reconnectTimeout = setTimeout(connectToSim, 5000)
         }
       });

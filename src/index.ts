@@ -16,8 +16,10 @@ async function initialize() {
         console.log(`Simulator detected: ${simulator}`);
 
         if (simulator === Simulator.MSFS) {
+          await stopUDPServer();
           await startSimConnect();
         } else if (simulator === Simulator.XPLANE) {
+          await stopSimConnect();
           await startUDPServer();
         }
 
