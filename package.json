@@ -1,19 +1,30 @@
 {
-  "name": "simconnector",
+  "name": "OrionSimConnector",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "ts-node src/index.ts"
+    "start": "node dist/index.js",
+    "build-and-start": "npm run build && npm start"
+  },
+  "pkg": {
+    "scripts": "dist/index.js",
+    "targets": [
+      "node18-win-x64",
+      "node18-mac-x64",
+      "node18-linux-x64"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/long": "^5.0.0",
     "@types/pidusage": "^2.0.5",
     "dgram": "^1.0.1",
+    "long": "^5.2.3",
     "node-simconnect": "^3.6.2",
     "pidusage": "^3.0.2",
     "ps-list": "^8.1.1",

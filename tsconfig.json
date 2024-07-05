@@ -6,37 +6,9 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "types": ["node", "ws"]
+    "types": ["node", "ws","long"],
+    "skipLibCheck": true,
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
-
-//{
-//  "compilerOptions": {
-//    "module": "ESNext",
-//    "target": "ESNext",
-//    "moduleResolution": "Node",
-//    "outDir": "./dist",
-//    "esModuleInterop": true,
-//    "forceConsistentCasingInFileNames": true,
-//    "strict": true,
-//    "skipLibCheck": true
-//  },
-//  "include": ["src/**/*.ts"],
-//  "exclude": ["node_modules"]
-//}
-
-//{
-//  "compilerOptions": {
-//    "module": "commonjs",
-//    "target": "es6",
-//    "esModuleInterop": true,
-//    "resolveJsonModule": true,
-//    "moduleResolution": "node",
-//    "outDir": "./dist",
-//    "rootDir": "./src",
-//    "strict": true
-//  },
-//  "include": ["src/**/*"]
-//}
