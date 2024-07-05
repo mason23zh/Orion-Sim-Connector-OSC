@@ -1,12 +1,11 @@
-import dgram from "dgram";
-import { setCurrentSimulator, Simulator } from "./simulatorState";
-import { detectSimulator } from "./detectSimulator";
-import { FlightData, UdpError } from "./types";
+import dgram from 'dgram';
+import { setCurrentSimulator, Simulator } from './simulatorState';
+import { detectSimulator } from './detectSimulator';
+import { FlightData, UdpError } from './types';
 
 const HOST = '127.0.0.1';
 const FREQ = 3; // Frequency of updates (times per second)
-const RECEIVING_PORTS = [7172, 49001]; // X-Plane data receiving port list
-const XPLANE_PORTS = [49000, 49010]; // X-Plane data request port list
+const XPLANE_PORT = 49000; // X-Plane data request/receive port
 const VALID_DATA_TIMEOUT = 5000; // 5 seconds timeout to switch port
 const MeterToFeet = 3.28084;
 
@@ -15,10 +14,7 @@ let udpClient: dgram.Socket | null = null;
 let wsClients: any[] = [];
 let retryTimeout: NodeJS.Timeout | null = null;
 let lastValidDataTimestamp: number = Date.now();
-let currentReceivingPortIndex = 0;
-let currentXPlanePortIndex = 0;
 let checkInterval: NodeJS.Timeout | null = null;
-let sendInterval: NodeJS.Timeout | null = null;
 
 const createMessage = (dref: string, idx: number, freq: number): Buffer => {
   const message = Buffer.alloc(413);
@@ -47,7 +43,6 @@ const messages = [
 const parseUDPData = (message: Buffer): FlightData => {
   const label = message.toString('utf8', 0, 4);
   if (label !== 'RREF') {
-    //console.log('Unknown package. Ignoring:', label);
     return {};
   }
 
@@ -112,23 +107,17 @@ const broadcastToClients = (data: FlightData) => {
 
 const waitForXPlane = async () => {
   console.log('Waiting for X-Plane to start...');
-  while(await detectSimulator() !== Simulator.XPLANE){
+  while (await detectSimulator() !== Simulator.XPLANE) {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   console.log('X-Plane started.');
 };
 
-const switchPorts = () => {
-  currentReceivingPortIndex = (currentReceivingPortIndex + 1) % RECEIVING_PORTS.length;
-  currentXPlanePortIndex = (currentXPlanePortIndex + 1) % XPLANE_PORTS.length;
-  console.log(`Switching ports: Receiving on ${RECEIVING_PORTS[currentReceivingPortIndex]}, sending to ${XPLANE_PORTS[currentXPlanePortIndex]}`);
-  stopUDPServer();
-  startUDPServer();
-};
-
 const checkForValidData = () => {
   if (Date.now() - lastValidDataTimestamp > VALID_DATA_TIMEOUT) {
-    switchPorts();
+    console.log('No valid data received within the timeout period. Reconnecting...');
+    stopUDPServer();
+    startUDPServer();
   }
 };
 
@@ -144,11 +133,6 @@ export const startUDPServer = async (): Promise<void> => {
 
   udpClient = dgram.createSocket('udp4');
 
-  udpClient.on('listening', () => {
-    const address = udpClient!.address();
-    console.log(`UDP client listening on ${address.address}:${address.port}`);
-  });
-
   udpClient.on('message', (message) => {
     const flightData = parseUDPData(message);
     if (Object.keys(flightData).length > 0) {
@@ -159,39 +143,32 @@ export const startUDPServer = async (): Promise<void> => {
     }
   });
 
-  udpClient.on('error', (err:UdpError) => {
+  udpClient.on('error', (err: UdpError) => {
     console.error('UDP client error:', err);
     if (err.code === 'EACCES' || err.code === 'EADDRINUSE') {
       console.log('Retrying to bind the UDP client...');
-      switchPorts(); // Switch ports if binding fails
+      stopUDPServer();
+      startUDPServer();
     }
   });
 
-  udpClient.bind(RECEIVING_PORTS[currentReceivingPortIndex], () => {
-    // Send messages at the specified frequency
-    sendInterval = setInterval(() => {
-      messages.forEach((message) => {
-        udpClient!.send(message, 0, message.length, XPLANE_PORTS[currentXPlanePortIndex], HOST, (err) => {
-          if (err) {
-            console.error('Error sending UDP message:', err);
-          } else {
-            console.log(`UDP message sent to ${HOST}:${XPLANE_PORTS[currentXPlanePortIndex]}`);
-          }
-        });
-      });
-    }, 1000 / FREQ);
-
-    // Check for valid data periodically
-    checkInterval = setInterval(checkForValidData, VALID_DATA_TIMEOUT / 2);
+  // Send messages once to start receiving data from X-Plane
+  messages.forEach((message) => {
+    udpClient!.send(message, 0, message.length, XPLANE_PORT, HOST, (err) => {
+      if (err) {
+        console.error('Error sending UDP message:', err);
+      } else {
+        console.log(`UDP message sent to ${HOST}:${XPLANE_PORT}`);
+      }
+    });
   });
+
+  // Check for valid data periodically
+  // X-Plane will be detected before UDP initialized.
+  checkInterval = setInterval(checkForValidData, VALID_DATA_TIMEOUT / 2);
 };
 
 export const stopUDPServer = (): void => {
-  if (sendInterval) {
-    clearInterval(sendInterval);
-    sendInterval = null;
-  }
-
   if (checkInterval) {
     clearInterval(checkInterval);
     checkInterval = null;

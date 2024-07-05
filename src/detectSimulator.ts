@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { Simulator, setCurrentSimulator, getCurrentSimulator } from './simulatorState';
+import { Simulator, setCurrentSimulator, getCurrentSimulator, currentSimulator } from "./simulatorState";
 import { startSimConnect, stopSimConnect } from './simConnectServer';
 import { startUDPServer, stopUDPServer } from './udpServer';
 
@@ -59,6 +59,8 @@ export const detectSimulator = async (): Promise<Simulator> => {
 
 export const handleSimulatorSwitch = async () => {
   const newSimulator = await detectSimulator();
+
+  if(newSimulator === currentSimulator) return;
 
   if (newSimulator === Simulator.MSFS) {
     stopUDPServer();
