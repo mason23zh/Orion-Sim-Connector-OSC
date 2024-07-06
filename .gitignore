@@ -6,6 +6,5 @@ temp
 doc
 docs
 build
-index-linux
-index-macos
-index-win.exe
+release
+
