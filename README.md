@@ -1,4 +1,4 @@
-# Orion Sim Connector (OSC) Version 0.2
+# Orion Sim Connector (OSC) Version 0.3
 
 The purpose of OSC is to act like a bridge to fetch data from the sim and send the data
 into [Airport Weather](https:airportweather.org) website to display the location of the traffic from your sim.
@@ -24,10 +24,7 @@ If you are using X-plane 12, data will be read from default X-plane 12 data outp
 
 Port List:
 
-- 7172
-- 49001
 - 49000
-- 49010
 
 If you are using MSFS2020, data will be read using [node-simconnect](https://github.com/EvenAR/node-simconnect) plugin.
 
