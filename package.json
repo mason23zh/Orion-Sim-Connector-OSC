@@ -1,6 +1,6 @@
 {
   "name": "OrionSimConnector",
-  "version": "0.2",
+  "version": "0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -30,7 +30,6 @@
     "dgram": "^1.0.1",
     "long": "^5.2.3",
     "node-simconnect": "^3.6.2",
-    "socket.io": "^4.7.5",
     "ws": "^8.17.1"
   },
   "devDependencies": {

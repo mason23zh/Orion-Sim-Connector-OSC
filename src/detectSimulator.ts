@@ -1,4 +1,5 @@
 import {exec} from "child_process";
+import os from "os";
 import {Simulator, setCurrentSimulator, getCurrentSimulator} from "./simulatorState";
 import {startSimConnect, stopSimConnect} from "./simConnectServer";
 import {startUDPServer, stopUDPServer} from "./udpServer";
@@ -9,22 +10,45 @@ interface Process {
     cmd: string;
 }
 
+
 const getProcesses = (): Promise<Process[]> => {
     return new Promise((resolve, reject) => {
-        exec("tasklist", (err, stdout) => {
+        const platform = os.platform();
+
+        let command: string;
+        if (platform === "win32") {
+            command = "tasklist"
+        } else {
+            command = "ps -e -o pid=,comm="
+        }
+        exec(command, (err, stdout) => {
             if (err) {
                 return reject(err);
             }
 
-            const lines = stdout.split("\n");
-            const processes: Process[] = lines.slice(3).map(line => {
-                const parts = line.trim().split(/\s+/);
-                return {
-                    pid: parseInt(parts[1], 10),
-                    name: parts[0],
-                    cmd: parts.slice(0, -4).join(" ")
-                };
-            });
+            const lines = stdout.split("\n").filter(line => line.trim() !== '');
+            let processes: Process[] = [];
+
+            if (platform === "win32") {
+                // skip first 3 lines in Windows
+                processes = lines.slice(3).map(line => {
+                    const parts = line.trim().split(/\s+/);
+                    return {
+                        pid: parseInt(parts[1], 10),
+                        name: parts[0],
+                        cmd: parts.slice(0, -4).join(" ")
+                    };
+                });
+            } else {
+                processes = lines.map(line => {
+                    const parts = line.trim().split(/\s+/);
+                    return {
+                        pid: parseInt(parts[0], 10),
+                        name: parts[1],
+                        cmd: parts.slice(1).join(" ")
+                    };
+                });
+            }
 
             resolve(processes);
         });
