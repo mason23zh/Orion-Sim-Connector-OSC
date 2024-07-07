@@ -142,7 +142,7 @@ const connectToSim = () => {
                         indicated_airspeed: recvSimObjectData.data.readFloat64(),
                         true_airspeed: recvSimObjectData.data.readFloat64(),
                         groundspeed: recvSimObjectData.data.readFloat64(),
-                        pitch: recvSimObjectData.data.readFloat64(),
+                        pitch: recvSimObjectData.data.readFloat64() * -1,
                         roll: recvSimObjectData.data.readFloat64(),
                         vertical_speed: recvSimObjectData.data.readFloat64() * 60
                     };

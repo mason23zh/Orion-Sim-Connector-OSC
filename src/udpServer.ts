@@ -8,6 +8,7 @@ const FREQ = 3; // Frequency of updates (times per second)
 const XPLANE_PORT = 49000; // X-Plane data request/receive port
 const VALID_DATA_TIMEOUT = 5000; // 5 seconds timeout to switch port
 const MeterToFeet = 3.28084;
+const MeterPerSecToKtPerHour = 1.94384;
 
 let latestFlightData: FlightData = {};
 let udpClient: dgram.Socket | null = null;
@@ -34,7 +35,7 @@ const messages = [
     createMessage("sim/flightmodel/position/true_psi", 6, FREQ),
     createMessage("sim/flightmodel/position/indicated_airspeed", 7, FREQ),
     createMessage("sim/flightmodel/position/true_airspeed", 8, FREQ),
-    createMessage("sim/flightmodel/position/groundspeed", 9, FREQ),
+    createMessage("sim/flightmodel/position/groundspeed", 9, FREQ), // m/s
     createMessage("sim/flightmodel/position/true_theta", 10, FREQ),
     createMessage("sim/flightmodel/position/true_phi", 11, FREQ),
     createMessage("sim/flightmodel/position/vh_ind_fpm", 12, FREQ)
@@ -78,7 +79,7 @@ const parseUDPData = (message: Buffer): FlightData => {
                 flightData.true_airspeed = value;
                 break;
             case 9:
-                flightData.groundspeed = value;
+                flightData.groundspeed = value * MeterPerSecToKtPerHour;
                 break;
             case 10:
                 flightData.pitch = value;

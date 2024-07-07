@@ -43,6 +43,7 @@ async function monitorSimulator() {
 }
 
 async function initialize() {
+    console.log("OSC Version 0.3");
     wsServer.start();
 
     if (simulatorSwitchInterval) {

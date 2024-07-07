@@ -1,12 +1,12 @@
 {
   "name": "OrionSimConnector",
-  "version": "0.2",
+  "version": "0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "build-exe": "pkg dist/index.js -o release/OSC_0.2 -t node18-win-x64,node18-mac-x64,node18-linux-x64",
+    "build-exe": "pkg dist/index.js -o release/OSC_0.3 -t node18-win-x64,node18-mac-x64,node18-linux-x64",
     "start": "node dist/index.js",
     "start-dev": "ts-node src/index.ts",
     "build-and-start": "npm run build && npm start"
@@ -30,7 +30,6 @@
     "dgram": "^1.0.1",
     "long": "^5.2.3",
     "node-simconnect": "^3.6.2",
-    "socket.io": "^4.7.5",
     "ws": "^8.17.1"
   },
   "devDependencies": {
