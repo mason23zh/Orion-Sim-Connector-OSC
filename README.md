@@ -28,7 +28,7 @@ Port List:
 
 If you are using MSFS2020, data will be read using [node-simconnect](https://github.com/EvenAR/node-simconnect) plugin.
 
-OSC will open port `6789` on localhost to send those data out.
+OSC will open port `49153` on localhost to send those data out.
 
 ## Supported platforms:
 
