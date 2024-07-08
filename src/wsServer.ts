@@ -4,7 +4,7 @@ import {addClient as addUDPClient, removeClient as removeUDPClient} from "./udpS
 
 const wsServer = {
     start: () => {
-        const wss = new WebSocket.Server({port: 6789});
+        const wss = new WebSocket.Server({port: 49153});
         wss.on("connection", (ws) => {
             console.log("Client connected");
             addSimConnectClient(ws);
